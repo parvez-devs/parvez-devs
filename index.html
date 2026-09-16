@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A clean, fast to-do list with local storage." />
+  <title>TaskFlow — To-do List</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="app-card" aria-labelledby="app-title">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">PERSONAL PRODUCTIVITY</p>
+          <h1 id="app-title">TaskFlow</h1>
+          <p class="subtitle">Turn plans into progress.</p>
+        </div>
+        <div class="task-summary" aria-live="polite"><strong id="remaining-count">0</strong><span>tasks left</span></div>
+      </header>
+      <form id="todo-form" class="todo-form">
+        <label class="sr-only" for="todo-input">Add a new task</label>
+        <input id="todo-input" name="task" type="text" maxlength="140" placeholder="What needs to be done?" autocomplete="off" required />
+        <button type="submit" class="add-button">Add task <span aria-hidden="true">+</span></button>
+      </form>
+      <div class="toolbar">
+        <div class="filters" role="group" aria-label="Filter tasks">
+          <button class="filter-button active" data-filter="all" type="button">All</button>
+          <button class="filter-button" data-filter="active" type="button">Active</button>
+          <button class="filter-button" data-filter="completed" type="button">Completed</button>
+        </div>
+        <button id="clear-completed" class="text-button" type="button">Clear completed</button>
+      </div>
+      <ul id="todo-list" class="todo-list" aria-label="Your tasks"></ul>
+      <div id="empty-state" class="empty-state"><span class="empty-icon" aria-hidden="true">✓</span><h2 id="empty-title">No tasks yet</h2><p id="empty-message">Add something you want to accomplish today.</p></div>
+      <footer class="app-footer"><span>Saved automatically in your browser</span><span class="storage-dot" aria-hidden="true"></span></footer>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
