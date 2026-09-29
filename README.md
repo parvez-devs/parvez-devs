@@ -77,7 +77,7 @@ A polished, responsive to-do list application built with vanilla HTML, CSS, and 
 I’m always interested in good ideas, interesting products, and opportunities to collaborate.
 
 - GitHub: [@parvez-devs](https://github.com/parvez-devs)
-- Email: [yourmail@example.com](mailto:yourmail@example.com)
+- Email: [admin@xionhub.me](mailto:admin@xionhub.me)
 - LinkedIn: [Connect with me](https://www.linkedin.com/)
 
 > Building thoughtful web experiences that are fast, clean, and impactful.
