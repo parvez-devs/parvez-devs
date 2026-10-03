@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#060910">
+  <title>Live Preview Admin</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="admin-page">
+  <div class="admin-wrap">
+    <section id="loginView" class="login-view">
+      <form id="loginForm" class="panel login-panel">
+        <div class="eyebrow">CONTROL PANEL</div>
+        <h1>Admin login</h1>
+        <p>Manage preview GIFs and redirect links.</p>
+
+        <label>Username
+          <input id="username" autocomplete="username" required>
+        </label>
+
+        <label>Password
+          <input id="password" type="password" autocomplete="current-password" required>
+        </label>
+
+        <button type="submit">Sign in</button>
+        <div id="loginMessage" class="message"></div>
+      </form>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <header class="admin-head">
+        <div>
+          <div class="eyebrow">LIVE PREVIEW</div>
+          <h1>Content manager</h1>
+        </div>
+        <div class="actions">
+          <a class="button-link" href="/" target="_blank">Open site</a>
+          <button id="addCard">+ Add card</button>
+          <button id="logout" class="ghost">Logout</button>
+        </div>
+      </header>
+
+      <div class="notice">Changes save immediately. Uploaded GIF/WebP/JPG/PNG files persist on the Railway volume.</div>
+
+      <section class="panel global-panel">
+        <div class="eyebrow">FULL SCREEN REDIRECT</div>
+        <label>Global Adsterra / redirect link
+          <input id="globalAdUrl" placeholder="https://...">
+        </label>
+        <div class="row">
+          <button id="saveGlobal" type="button">Save global redirect</button>
+          <span id="globalMessage" class="status"></span>
+          <span id="globalClicks" class="clicks"></span>
+        </div>
+      </section>
+
+      <div id="cards" class="admin-cards"></div>
+    </section>
+  </div>
+
+  <script src="/admin.js" defer></script>
+</body>
+</html>
