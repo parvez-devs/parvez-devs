@@ -53,9 +53,21 @@ function cardHtml(stream) {
   '</article>';
 }
 
+function renderHeroPreview(url) {
+  const box = q("#heroPreviewBox");
+  const value = String(url || "").trim();
+  if (!value) {
+    box.innerHTML = "<span>No main player preview URL set</span>";
+    return;
+  }
+  box.innerHTML = '<img src="' + esc(value) + '" alt="Main player preview">';
+}
+
 async function load() {
   const data = await api("/api/admin/state");
   q("#globalAdUrl").value = data.globalAdUrl || "";
+  q("#heroMediaUrl").value = data.heroMediaUrl || "";
+  renderHeroPreview(data.heroMediaUrl || "");
   q("#globalClicks").textContent = "Global clicks: " + Number(data.globalClicks || 0).toLocaleString();
   q("#cards").innerHTML = data.streams.map(cardHtml).join("");
   bindCards();
@@ -136,14 +148,22 @@ q("#saveGlobal").onclick = async function () {
   try {
     const data = await api("/api/admin/global", {
       method: "PUT",
-      body: JSON.stringify({ globalAdUrl: q("#globalAdUrl").value })
+      body: JSON.stringify({
+        globalAdUrl: q("#globalAdUrl").value,
+        heroMediaUrl: q("#heroMediaUrl").value.trim()
+      })
     });
     q("#globalMessage").textContent = "Saved";
+    renderHeroPreview(data.heroMediaUrl || "");
     q("#globalClicks").textContent = "Global clicks: " + Number(data.globalClicks || 0).toLocaleString();
   } catch (error) {
     q("#globalMessage").textContent = error.message;
   }
 };
+
+q("#heroMediaUrl").addEventListener("input", function () {
+  renderHeroPreview(this.value);
+});
 
 q("#addCard").onclick = async function () {
   await api("/api/admin/streams", {
