@@ -24,6 +24,7 @@ const defaults = {
   updatedAt: new Date().toISOString(),
   globalAdUrl: "",
   globalClicks: 0,
+  heroMediaUrl: "",
   streams: []
 };
 
@@ -44,6 +45,7 @@ async function readDB() {
       d.globalAdUrl = d.streams.find((x) => x.enabled && validUrl(x.adUrl))?.adUrl || "";
     }
     if (!("globalClicks" in d)) d.globalClicks = 0;
+    if (!("heroMediaUrl" in d)) d.heroMediaUrl = "";
     return d;
   } catch {
     await writeDB(defaults);
@@ -264,6 +266,7 @@ async function route(req, res) {
       .map(({ clicks, ...x }) => x);
     return json(res, 200, {
       streams,
+      heroMediaUrl: validUrl(d.heroMediaUrl) || String(d.heroMediaUrl || "").startsWith("/media/") ? d.heroMediaUrl : "",
       updatedAt: d.updatedAt,
       globalRedirect: validUrl(d.globalAdUrl)
     });
@@ -324,13 +327,18 @@ async function route(req, res) {
   if (req.method === "PUT" && u.pathname === "/api/admin/global") {
     const b = await readJson(req);
     if (!validUrl(b.globalAdUrl)) return json(res, 400, { error: "Invalid global redirect URL" });
+    if ("heroMediaUrl" in b && b.heroMediaUrl && !validUrl(b.heroMediaUrl) && !String(b.heroMediaUrl).startsWith("/media/")) {
+      return json(res, 400, { error: "Invalid main player media URL" });
+    }
     const d = await readDB();
     d.globalAdUrl = b.globalAdUrl;
+    if ("heroMediaUrl" in b) d.heroMediaUrl = String(b.heroMediaUrl || "");
     d.globalClicks = Number(d.globalClicks || 0);
     d.updatedAt = new Date().toISOString();
     await writeDB(d);
     return json(res, 200, {
       globalAdUrl: d.globalAdUrl,
+      heroMediaUrl: d.heroMediaUrl || "",
       globalClicks: d.globalClicks
     });
   }
