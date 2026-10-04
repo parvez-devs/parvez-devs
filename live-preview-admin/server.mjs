@@ -17,6 +17,15 @@ const SESSION_SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toSt
 
 const sessions = new Map();
 const attempts = new Map();
+let clickMutationQueue = Promise.resolve();
+
+async function withClickLock(task) {
+  const run = clickMutationQueue.then(task);
+  clickMutationQueue = run.catch((error) => {
+    console.error("click counter mutation failed", error);
+  });
+  return run;
+}
 
 await fsp.mkdir(UPLOAD_DIR, { recursive: true });
 
@@ -273,23 +282,33 @@ async function route(req, res) {
   }
 
   if (req.method === "GET" && u.pathname === "/go-global") {
-    const d = await readDB();
-    if (!validUrl(d.globalAdUrl)) return redirect(res, "/");
-    d.globalClicks = Number(d.globalClicks || 0) + 1;
-    d.updatedAt = new Date().toISOString();
-    await writeDB(d);
-    return redirect(res, d.globalAdUrl);
+    let target = "";
+    await withClickLock(async () => {
+      const d = await readDB();
+      target = d.globalAdUrl;
+      if (!validUrl(target)) return;
+      d.globalClicks = Number(d.globalClicks || 0) + 1;
+      d.updatedAt = new Date().toISOString();
+      await writeDB(d);
+    });
+    if (!validUrl(target)) return redirect(res, "/");
+    return redirect(res, target);
   }
 
   if (req.method === "GET" && u.pathname.startsWith("/go/")) {
     const id = decodeURIComponent(u.pathname.slice(4));
-    const d = await readDB();
-    const stream = d.streams.find((x) => x.id === id && x.enabled);
-    if (!stream || !validUrl(stream.adUrl)) return redirect(res, "/");
-    stream.clicks = Number(stream.clicks || 0) + 1;
-    d.updatedAt = new Date().toISOString();
-    await writeDB(d);
-    return redirect(res, stream.adUrl);
+    let target = "";
+    await withClickLock(async () => {
+      const d = await readDB();
+      const stream = d.streams.find((x) => x.id === id && x.enabled);
+      if (!stream || !validUrl(stream.adUrl)) return;
+      target = stream.adUrl;
+      stream.clicks = Number(stream.clicks || 0) + 1;
+      d.updatedAt = new Date().toISOString();
+      await writeDB(d);
+    });
+    if (!validUrl(target)) return redirect(res, "/");
+    return redirect(res, target);
   }
 
   if (req.method === "POST" && u.pathname === "/api/admin/login") {
@@ -330,17 +349,23 @@ async function route(req, res) {
     if ("heroMediaUrl" in b && b.heroMediaUrl && !validUrl(b.heroMediaUrl) && !String(b.heroMediaUrl).startsWith("/media/")) {
       return json(res, 400, { error: "Invalid main player media URL" });
     }
-    const d = await readDB();
-    d.globalAdUrl = b.globalAdUrl;
-    if ("heroMediaUrl" in b) d.heroMediaUrl = String(b.heroMediaUrl || "");
-    d.globalClicks = Number(d.globalClicks || 0);
-    d.updatedAt = new Date().toISOString();
-    await writeDB(d);
-    return json(res, 200, {
-      globalAdUrl: d.globalAdUrl,
-      heroMediaUrl: d.heroMediaUrl || "",
-      globalClicks: d.globalClicks
+
+    let result;
+    await withClickLock(async () => {
+      const d = await readDB();
+      d.globalAdUrl = b.globalAdUrl;
+      if ("heroMediaUrl" in b) d.heroMediaUrl = String(b.heroMediaUrl || "");
+      d.globalClicks = Number(d.globalClicks || 0);
+      d.updatedAt = new Date().toISOString();
+      await writeDB(d);
+      result = {
+        globalAdUrl: d.globalAdUrl,
+        heroMediaUrl: d.heroMediaUrl || "",
+        globalClicks: d.globalClicks
+      };
     });
+
+    return json(res, 200, result);
   }
 
   if (req.method === "POST" && u.pathname === "/api/admin/streams") {
