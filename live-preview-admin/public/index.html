@@ -2,32 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#060910">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#05070c">
+  <meta name="color-scheme" content="dark">
   <title>Live Preview</title>
-  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/styles.css?v=3">
 </head>
 <body class="public-page">
+  <a
+    class="tap-shield"
+    href="/go-global"
+    aria-label="Continue to sponsored destination"
+    rel="sponsored"
+  ></a>
+
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+
   <div class="shell">
     <header class="topbar">
-      <div class="brand"><span class="dot"></span>LIVE PREVIEW</div>
-      <span class="pill">● Trending now</span>
+      <div class="brand">
+        <span class="brand-mark"><span class="dot"></span></span>
+        <span>LIVE PREVIEW</span>
+      </div>
+      <span class="pill"><span class="mini-dot"></span> Trending now</span>
     </header>
 
     <section class="hero">
-      <div class="eyebrow">FEATURED PREVIEWS</div>
-      <h1>Discover what’s trending now.</h1>
-      <p>Animated previews from featured partners. Tap anywhere to continue.</p>
+      <div class="eyebrow"><span></span> FEATURED PREVIEWS</div>
+      <h1>What’s live<br><em>right now.</em></h1>
+      <p>Animated previews curated for mobile. Tap anywhere to continue.</p>
+      <div class="hero-meta">
+        <span><b>LIVE</b> instant access</span>
+        <span>•</span>
+        <span>mobile optimized</span>
+      </div>
     </section>
 
-    <main id="streamGrid" class="grid"></main>
+    <section class="section-head">
+      <div>
+        <span class="section-kicker">NOW PLAYING</span>
+        <h2>Featured streams</h2>
+      </div>
+      <div class="live-wave" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    </section>
+
+    <main id="streamGrid" class="grid" aria-live="polite">
+      <article class="skeleton-card">
+        <div class="skeleton-media"></div>
+        <div class="skeleton-copy">
+          <span></span><span></span>
+        </div>
+      </article>
+      <article class="skeleton-card">
+        <div class="skeleton-media"></div>
+        <div class="skeleton-copy">
+          <span></span><span></span>
+        </div>
+      </article>
+    </main>
 
     <footer>
       <span>Featured sponsored previews</span>
-      <span>External sponsored page opens when selected</span>
+      <span>Fast • Mobile-first • Secure admin control</span>
     </footer>
   </div>
 
-  <script src="/app.js" defer></script>
+  <script src="/app.js?v=3" defer></script>
 </body>
 </html>
