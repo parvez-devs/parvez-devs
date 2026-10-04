@@ -1,99 +1,73 @@
-const grid = document.getElementById("streamGrid");
+const grid=document.getElementById("streamGrid");
+const hero=document.getElementById("heroPlayer");
+const title=document.getElementById("heroTitle");
+const viewers=document.getElementById("heroViewers");
+const count=document.getElementById("streamCount");
 
-function esc(value) {
-  return String(value ?? "").replace(/[&<>"']/g, function (c) {
-    return {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[c];
-  });
-}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
 
-function card(stream, index) {
-  const media = stream.mediaUrl
-    ? '<img src="' + esc(stream.mediaUrl) + '" alt="" loading="' + (index < 2 ? "eager" : "lazy") + '" decoding="async" fetchpriority="' + (index === 0 ? "high" : "auto") + '">'
-    : '<div class="fallback"></div>';
-
-  return '<article class="card">' +
-    '<div class="preview">' +
-      media +
-      '<div class="shade"></div>' +
-      '<div class="grain"></div>' +
-      '<span class="tag"><span></span> LIVE</span>' +
-      '<span class="quality">HD</span>' +
-      '<span class="viewers">● ' + esc(stream.viewers || "Live") + '</span>' +
-      '<span class="play"><i></i></span>' +
-      '<div class="progress"><i></i></div>' +
-    '</div>' +
-    '<div class="info">' +
-      '<div class="avatar"><span>' + esc((stream.title || "L").trim().charAt(0).toUpperCase()) + '</span></div>' +
-      '<div class="copy">' +
-        '<h3>' + esc(stream.title || "New Preview") + '</h3>' +
-        '<p>' + esc(stream.subtitle || "Sponsored preview") + '</p>' +
-      '</div>' +
-      '<span class="continue">WATCH <b>›</b></span>' +
-    '</div>' +
+function rec(stream,index){
+  const media=stream.mediaUrl
+    ? '<img src="'+esc(stream.mediaUrl)+'" alt="" loading="'+(index<2?"eager":"lazy")+'" decoding="async">'
+    : '<div class="rec-fallback"></div>';
+  return '<article class="rec-card">'+
+    '<div class="rec-media">'+media+
+      '<span class="rec-live">LIVE</span>'+
+      '<span class="rec-view">● '+esc(stream.viewers||"Live")+'</span>'+
+      '<span class="rec-play"><i></i></span>'+
+    '</div>'+
+    '<div class="rec-info"><div><h3>'+esc(stream.title||"Live Stream")+'</h3><p>'+esc(stream.subtitle||"VIP preview")+'</p></div><b>›</b></div>'+
   '</article>';
 }
 
-fetch("/api/streams", {
-  cache: "no-store",
-  credentials: "same-origin"
-})
-  .then(function (response) {
-    if (!response.ok) throw new Error("feed");
-    return response.json();
-  })
-  .then(function (data) {
-    const streams = Array.isArray(data.streams) ? data.streams : [];
-    if (!streams.length) {
-      grid.innerHTML = '<div class="empty"><b>LIVE</b><span>New previews are being prepared.</span></div>';
-      return;
+fetch("/api/streams",{cache:"no-store",credentials:"same-origin"})
+  .then(r=>{if(!r.ok)throw new Error("feed");return r.json();})
+  .then(data=>{
+    const streams=Array.isArray(data.streams)?data.streams:[];
+    const first=streams[0];
+    if(first){
+      if(first.mediaUrl){
+        const img=new Image();
+        img.decoding="async";
+        img.fetchPriority="high";
+        img.src=first.mediaUrl;
+        img.alt="";
+        hero.prepend(img);
+      }
+      title.textContent=first.title||"[LEAKED HD] Exclusive Private Live Stream - Watch Before Taken Down!";
+      viewers.textContent=first.viewers||"92,450";
+    }else{
+      title.textContent="[LEAKED HD] Exclusive Private Live Stream - Watch Before Taken Down!";
+      viewers.textContent="92,450";
     }
-    grid.innerHTML = streams.map(card).join("");
+    count.textContent=(streams.length||1)+" LIVE";
+    const rest=streams.length>1?streams.slice(1):streams;
+    grid.innerHTML=rest.length?rest.map(rec).join(""):'<div class="empty-rec">More streams are loading...</div>';
   })
-  .catch(function () {
-    grid.innerHTML = '<div class="empty"><b>LIVE</b><span>Refreshing preview feed…</span></div>';
+  .catch(()=>{
+    title.textContent="[LEAKED HD] Exclusive Private Live Stream - Watch Before Taken Down!";
+    viewers.textContent="92,450";
+    grid.innerHTML='<div class="empty-rec">Live recommendations refreshing...</div>';
   });
 
-/*
-  The fixed .tap-shield is the primary click catcher and works before JS loads.
-  This capture listener is a fallback for browsers/extensions that suppress
-  clicks on transparent fixed links.
-*/
-let pointerStart = null;
-let redirecting = false;
+let start=null,redirecting=false;
+function go(){if(redirecting)return;redirecting=true;location.assign("/go-global");}
 
-function go() {
-  if (redirecting) return;
-  redirecting = true;
-  window.location.assign("/go-global");
-}
+document.addEventListener("pointerdown",e=>{
+  if(e.pointerType==="mouse"&&e.button!==0)return;
+  start={x:e.clientX,y:e.clientY,t:performance.now()};
+},true);
 
-document.addEventListener("pointerdown", function (event) {
-  if (event.pointerType === "mouse" && event.button !== 0) return;
-  pointerStart = { x: event.clientX, y: event.clientY, t: performance.now() };
-}, true);
+document.addEventListener("pointerup",e=>{
+  if(!start)return;
+  const moved=Math.hypot(e.clientX-start.x,e.clientY-start.y);
+  const elapsed=performance.now()-start.t;
+  start=null;
+  if(moved<=12&&elapsed<=900){e.preventDefault();go();}
+},true);
 
-document.addEventListener("pointerup", function (event) {
-  if (!pointerStart) return;
-  const dx = event.clientX - pointerStart.x;
-  const dy = event.clientY - pointerStart.y;
-  const distance = Math.hypot(dx, dy);
-  const elapsed = performance.now() - pointerStart.t;
-  pointerStart = null;
-
-  if (distance <= 12 && elapsed <= 900) {
-    event.preventDefault();
-    go();
-  }
-}, true);
-
-document.addEventListener("click", function (event) {
-  if (event.button !== undefined && event.button !== 0) return;
-  event.preventDefault();
+document.addEventListener("click",e=>{
+  if(e.button!==undefined&&e.button!==0)return;
+  e.preventDefault();
   go();
-}, true);
+},true);
