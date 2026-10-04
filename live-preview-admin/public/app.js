@@ -27,12 +27,16 @@ fetch("/api/streams",{cache:"no-store",credentials:"same-origin"})
     const first=streams[0];
     const heroMedia=data.heroMediaUrl || (first && first.mediaUrl) || "";
     if(heroMedia){
+      const safeHero=String(heroMedia).replace(/["\\]/g,"\\    if(heroMedia){
       const img=new Image();
       img.decoding="async";
       img.fetchPriority="high";
       img.src=heroMedia;
       img.alt="";
       hero.prepend(img);
+    }");
+      hero.classList.add("has-media");
+      hero.style.backgroundImage='url("' + safeHero + '")';
     }
     if(first){
       title.textContent=first.title||"[LEAKED HD] Exclusive Private Live Stream - Watch Before Taken Down!";
