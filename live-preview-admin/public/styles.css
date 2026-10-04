@@ -61,3 +61,69 @@
     linear-gradient(to bottom,rgba(0,0,0,.02),rgba(0,0,0,.02) 52%,rgba(0,0,0,.28)),
     radial-gradient(circle,transparent 64%,rgba(0,0,0,.12))!important;
 }
+
+.delayed-cta{
+  position:fixed;
+  left:50%;
+  bottom:max(18px,env(safe-area-inset-bottom));
+  z-index:99998;
+  width:min(420px,calc(100% - 28px));
+  min-height:58px;
+  padding:10px 12px;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  color:#fff;
+  background:linear-gradient(135deg,rgba(255,47,79,.96),rgba(156,29,61,.96));
+  box-shadow:0 18px 45px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.04) inset;
+  backdrop-filter:blur(12px);
+  opacity:0;
+  transform:translate(-50%,24px) scale(.98);
+  pointer-events:none;
+  animation:ctaReveal .24s ease 2.5s forwards;
+}
+@keyframes ctaReveal{
+  to{
+    opacity:1;
+    transform:translate(-50%,0) scale(1);
+  }
+}
+.cta-live-dot{
+  width:10px;
+  height:10px;
+  flex:0 0 10px;
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 0 5px rgba(255,255,255,.12),0 0 16px rgba(255,255,255,.7);
+}
+.cta-copy{
+  min-width:0;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  line-height:1.05;
+}
+.cta-copy b{
+  font-size:12px;
+  letter-spacing:.08em;
+}
+.cta-copy small{
+  margin-top:4px;
+  color:rgba(255,255,255,.72);
+  font-size:8px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+}
+.cta-arrow{
+  font-size:28px;
+  line-height:1;
+  opacity:.9;
+}
+@media(max-width:560px){
+  .delayed-cta{
+    width:calc(100% - 20px);
+    bottom:max(12px,env(safe-area-inset-bottom));
+  }
+}
