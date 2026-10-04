@@ -44,12 +44,20 @@
       <div class="notice">Changes save immediately. Uploaded GIF/WebP/JPG/PNG files persist on the Railway volume.</div>
 
       <section class="panel global-panel">
-        <div class="eyebrow">FULL SCREEN REDIRECT</div>
+        <div class="eyebrow">MAIN PLAYER PREVIEW</div>
+        <label>First big player GIF / image URL
+          <input id="heroMediaUrl" placeholder="https://example.com/preview.gif">
+        </label>
+        <div id="heroPreviewBox" class="hero-admin-preview">
+          <span>No main player preview URL set</span>
+        </div>
+
+        <div class="eyebrow admin-section-gap">FULL SCREEN REDIRECT</div>
         <label>Global Adsterra / redirect link
           <input id="globalAdUrl" placeholder="https://...">
         </label>
         <div class="row">
-          <button id="saveGlobal" type="button">Save global redirect</button>
+          <button id="saveGlobal" type="button">Save player + redirect</button>
           <span id="globalMessage" class="status"></span>
           <span id="globalClicks" class="clicks"></span>
         </div>
