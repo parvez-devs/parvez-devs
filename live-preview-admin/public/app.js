@@ -85,34 +85,6 @@ fetch("/api/streams",{cache:"no-store",credentials:"same-origin"})
     grid.innerHTML='<div class="empty-rec">Live recommendations refreshing...</div>';
   });
 
-let start=null;
-let redirecting=false;
-
-function go(){
-  if(redirecting) return;
-  redirecting=true;
-  location.assign("/go-global");
-}
-
-document.addEventListener("pointerdown",e=>{
-  if(e.pointerType==="mouse"&&e.button!==0) return;
-  start={x:e.clientX,y:e.clientY,t:performance.now()};
-},true);
-
-document.addEventListener("pointerup",e=>{
-  if(!start) return;
-  const moved=Math.hypot(e.clientX-start.x,e.clientY-start.y);
-  const elapsed=performance.now()-start.t;
-  start=null;
-
-  if(moved<=12&&elapsed<=900){
-    e.preventDefault();
-    go();
-  }
-},true);
-
-document.addEventListener("click",e=>{
-  if(e.button!==undefined&&e.button!==0) return;
-  e.preventDefault();
-  go();
-},true);
+// Full-screen click handling is provided by the fixed .tap-shield anchor.
+ // It opens /go-global in a new tab so the landing page remains available
+ // when the visitor goes back or closes the sponsored tab.
