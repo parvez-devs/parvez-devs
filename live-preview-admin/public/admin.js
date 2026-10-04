@@ -68,7 +68,7 @@ async function load() {
   q("#globalAdUrl").value = data.globalAdUrl || "";
   q("#heroMediaUrl").value = data.heroMediaUrl || "";
   renderHeroPreview(data.heroMediaUrl || "");
-  q("#globalClicks").textContent = "Global clicks: " + Number(data.globalClicks || 0).toLocaleString();
+  q("#globalClicks").textContent = "Verified redirect hits: " + Number(data.globalClicks || 0).toLocaleString();
   q("#cards").innerHTML = data.streams.map(cardHtml).join("");
   bindCards();
 }
@@ -155,7 +155,7 @@ q("#saveGlobal").onclick = async function () {
     });
     q("#globalMessage").textContent = "Saved";
     renderHeroPreview(data.heroMediaUrl || "");
-    q("#globalClicks").textContent = "Global clicks: " + Number(data.globalClicks || 0).toLocaleString();
+    q("#globalClicks").textContent = "Verified redirect hits: " + Number(data.globalClicks || 0).toLocaleString();
   } catch (error) {
     q("#globalMessage").textContent = error.message;
   }
