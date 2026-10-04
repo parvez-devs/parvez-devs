@@ -1,15 +1,25 @@
 const grid=document.getElementById("streamGrid");
 const hero=document.getElementById("heroPlayer");
+const heroMediaEl=document.getElementById("heroMedia");
 const title=document.getElementById("heroTitle");
 const viewers=document.getElementById("heroViewers");
 const count=document.getElementById("streamCount");
 
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  }[c]));
+}
 
 function rec(stream,index){
   const media=stream.mediaUrl
     ? '<img src="'+esc(stream.mediaUrl)+'" alt="" loading="'+(index<2?"eager":"lazy")+'" decoding="async">'
     : '<div class="rec-fallback"></div>';
+
   return '<article class="rec-card">'+
     '<div class="rec-media">'+media+
       '<span class="rec-live">LIVE</span>'+
@@ -20,59 +30,89 @@ function rec(stream,index){
   '</article>';
 }
 
+function setHeroMedia(url){
+  const value=String(url||"").trim();
+
+  hero.classList.remove("has-media","media-error");
+  heroMediaEl.removeAttribute("src");
+  heroMediaEl.style.display="none";
+
+  if(!value) return;
+
+  heroMediaEl.onload=()=>{
+    heroMediaEl.style.display="block";
+    hero.classList.add("has-media");
+  };
+
+  heroMediaEl.onerror=()=>{
+    heroMediaEl.style.display="none";
+    hero.classList.remove("has-media");
+    hero.classList.add("media-error");
+  };
+
+  heroMediaEl.src=value;
+}
+
 fetch("/api/streams",{cache:"no-store",credentials:"same-origin"})
-  .then(r=>{if(!r.ok)throw new Error("feed");return r.json();})
+  .then(r=>{
+    if(!r.ok) throw new Error("feed");
+    return r.json();
+  })
   .then(data=>{
     const streams=Array.isArray(data.streams)?data.streams:[];
     const first=streams[0];
-    const heroMedia=data.heroMediaUrl || (first && first.mediaUrl) || "";
-    if(heroMedia){
-      const safeHero=String(heroMedia).replace(/["\\]/g,"\\    if(heroMedia){
-      const img=new Image();
-      img.decoding="async";
-      img.fetchPriority="high";
-      img.src=heroMedia;
-      img.alt="";
-      hero.prepend(img);
-    }");
-      hero.classList.add("has-media");
-      hero.style.backgroundImage='url("' + safeHero + '")';
-    }
+    const heroMedia=data.heroMediaUrl || (first&&first.mediaUrl) || "";
+
+    setHeroMedia(heroMedia);
+
     if(first){
-      title.textContent=first.title||"[LEAKED HD] Exclusive Private Live Stream - Watch Before Taken Down!";
-      viewers.textContent=first.viewers||"92,450";
+      title.textContent=first.title||"Exclusive Private Live Stream";
+      viewers.textContent=first.viewers||"Live";
     }else{
-      title.textContent="[LEAKED HD] Exclusive Private Live Stream - Watch Before Taken Down!";
-      viewers.textContent="92,450";
+      title.textContent="Exclusive Private Live Stream";
+      viewers.textContent="Live";
     }
+
     count.textContent=(streams.length||1)+" LIVE";
     const rest=streams.length>1?streams.slice(1):streams;
-    grid.innerHTML=rest.length?rest.map(rec).join(""):'<div class="empty-rec">More streams are loading...</div>';
+    grid.innerHTML=rest.length
+      ? rest.map(rec).join("")
+      : '<div class="empty-rec">More streams are loading...</div>';
   })
   .catch(()=>{
-    title.textContent="[LEAKED HD] Exclusive Private Live Stream - Watch Before Taken Down!";
-    viewers.textContent="92,450";
+    title.textContent="Exclusive Private Live Stream";
+    viewers.textContent="Live";
     grid.innerHTML='<div class="empty-rec">Live recommendations refreshing...</div>';
   });
 
-let start=null,redirecting=false;
-function go(){if(redirecting)return;redirecting=true;location.assign("/go-global");}
+let start=null;
+let redirecting=false;
+
+function go(){
+  if(redirecting) return;
+  redirecting=true;
+  location.assign("/go-global");
+}
 
 document.addEventListener("pointerdown",e=>{
-  if(e.pointerType==="mouse"&&e.button!==0)return;
+  if(e.pointerType==="mouse"&&e.button!==0) return;
   start={x:e.clientX,y:e.clientY,t:performance.now()};
 },true);
 
 document.addEventListener("pointerup",e=>{
-  if(!start)return;
+  if(!start) return;
   const moved=Math.hypot(e.clientX-start.x,e.clientY-start.y);
   const elapsed=performance.now()-start.t;
   start=null;
-  if(moved<=12&&elapsed<=900){e.preventDefault();go();}
+
+  if(moved<=12&&elapsed<=900){
+    e.preventDefault();
+    go();
+  }
 },true);
 
 document.addEventListener("click",e=>{
-  if(e.button!==undefined&&e.button!==0)return;
+  if(e.button!==undefined&&e.button!==0) return;
   e.preventDefault();
   go();
 },true);
