@@ -25,3 +25,15 @@
   object-fit:cover;
   display:block
 }
+
+.player.has-media{
+  background-size:cover!important;
+  background-position:center center!important;
+  background-repeat:no-repeat!important;
+}
+.player.has-media .player-placeholder{
+  display:none!important;
+}
+.player.has-media .player-vignette{
+  background:linear-gradient(to bottom,rgba(0,0,0,.03),rgba(0,0,0,.04) 50%,rgba(0,0,0,.32))!important;
+}
