@@ -37,3 +37,27 @@
 .player.has-media .player-vignette{
   background:linear-gradient(to bottom,rgba(0,0,0,.03),rgba(0,0,0,.04) 50%,rgba(0,0,0,.32))!important;
 }
+
+.hero-media{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:none;
+  filter:brightness(.96) saturate(1.04);
+  transform:scale(1.002);
+}
+.player.has-media .hero-media{
+  display:block;
+}
+.player.has-media .player-placeholder{
+  opacity:0;
+}
+.player.has-media .player-vignette{
+  background:
+    linear-gradient(to bottom,rgba(0,0,0,.02),rgba(0,0,0,.02) 52%,rgba(0,0,0,.28)),
+    radial-gradient(circle,transparent 64%,rgba(0,0,0,.12))!important;
+}
